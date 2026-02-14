@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine Surprise 💖</title>
+<style>
+body { margin:0; font-family: Georgia, serif; background: linear-gradient(to bottom, #ffb6c1, #ffe4e9); text-align:center; color:#b3003b; overflow-x:hidden; }
+.screen { display:none; padding:50px 20px; min-height:100vh; position:relative; }
+.active { display:block; }
+h1 { font-size:3rem; margin-bottom:15px; }
+button { padding:12px 25px; font-size:1.1rem; border:none; border-radius:25px; background:#ff3366; color:white; cursor:pointer; transition:0.3s; margin-top:15px;}
+button:hover {background:#cc0044;}
+input { padding:10px; font-size:1.2rem; border-radius:10px; border:2px solid #ff3366; text-align:center; margin-top:10px;}
+.hint { margin-top:15px; font-size:1rem; color:darkred;}
+.letter { max-width:650px; margin:30px auto; background:white; padding:25px; border-radius:20px; font-size:1.2rem; line-height:1.7; box-shadow:0px 4px 15px rgba(0,0,0,0.2);}
+#loveTimer { font-size:1.6rem; font-weight:bold; margin-top:10px;}
+#loveLine { font-size:1.2rem; color:#b3003b; margin-top:10px;}
+.gameArea, .quizArea { margin-top:30px; font-size:1.2rem; }
+.quizQuestion { margin-top:15px; }
+.quizOption { margin:8px; padding:8px 15px; border-radius:15px; border:2px solid #ff3366; background:#ffe4e9; color:#b3003b; cursor:pointer; transition:0.3s; }
+.quizOption:hover { background:#ffcccc; }
+
+/* Confetti canvas */
+#confettiCanvas { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999; }
+
+/* Floating hearts */
+.heart {
+  position: fixed;
+  font-size: 20px;
+  color: #ff3366;
+  animation: floatUp linear infinite;
+  user-select: none;
+  pointer-events: none;
+}
+@keyframes floatUp {
+  0% { transform: translateY(0) scale(1); opacity:1; }
+  100% { transform: translateY(-100vh) scale(1.5); opacity:0; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="confettiCanvas"></canvas>
+
+<!-- Cover Page -->
+<div class="screen active" id="screen1">
+<h1>💖 Happy Valentine’s Day Baby 💖</h1>
+<p>I made something special just for you…</p>
+<button onclick="goToScreen(2)">Next ➝</button>
+</div>
+
+<!-- Passcode Page -->
+<div class="screen" id="screen2">
+<h1>🔒 Enter the Passcode</h1>
+<p>Only my baby can unlock this 💌</p>
+<input type="password" id="passcode" placeholder="Enter code">
+<br>
+<button onclick="checkCode()">Unlock 💝</button>
+<p class="hint" id="hintMsg"></p>
+</div>
+
+<!-- Game Page -->
+<div class="screen" id="screen3">
+<h1>🎲 Guess the Number Game 🎲</h1>
+<p>Guess my special number (multiple of 2 between 2–20) 💌</p>
+<div class="gameArea">
+<input type="number" id="guessNumber" placeholder="Your guess">
+<button onclick="checkGuess()">Guess</button>
+<p id="gameHint"></p>
+<button id="gameNextBtn" style="display:none;" onclick="nextGameRound()">Next Round ➝</button>
+</div>
+</div>
+
+<!-- Quiz Page -->
+<div class="screen" id="screen4">
+<h1>❣️ Love Quiz ❣️</h1>
+<div class="quizArea">
+<p class="quizQuestion" id="quizQuestion"></p>
+<div id="quizOptions"></div>
+<p id="quizFeedback"></p>
+<button id="nextQuestionBtn" style="display:none;" onclick="nextQuestion()">Next Question ➝</button>
+</div>
+</div>
+
+<!-- Countdown Page -->
+<div class="screen" id="screen5">
+<h1>💞 Our Love Timeline 💞</h1>
+<p>We’ve been together since <b>15 Aug 2025</b></p>
+<p id="loveTimer"></p>
+<p id="loveLine">And I still fall for you every single day 💖</p>
+<button onclick="goToScreen(6)">Next ➝</button>
+</div>
+
+<!-- Love Letter Page -->
+<div class="screen" id="screen6">
+<h1>💌 Love Letter 💌</h1>
+<div class="letter">
+<p>
+My dearest Appu,<br><br>
+Happy Valentine’s Day baby ❤️<br>
+I made this little surprise just for you because you mean more to me than I could ever explain.<br><br>
+You are my happiness, my comfort, my favorite person, and the best part of my days.<br><br>
+Every moment with you feels special, and every memory we’ve made together is something I’ll hold close forever.<br><br>
+Thank you for loving me, for being mine, and for being the most beautiful part of my life.<br><br>
+I love you endlessly, Appu 💖<br><br>
+Forever yours,<br>
+<b>❤️ Anee</b>
+</p>
+</div>
+</div>
+
+<script>
+// Floating hearts
+function createHeart() {
+  const heart = document.createElement('div');
+  heart.className = 'heart';
+  heart.innerHTML = '💖';
+  heart.style.left = Math.random()*100+'vw';
+  heart.style.animationDuration = (3 + Math.random()*3)+'s';
+  heart.style.fontSize = (12 + Math.random()*24)+'px';
+  document.body.appendChild(heart);
+  setTimeout(()=>heart.remove(), 6000);
+}
+setInterval(createHeart, 500);
+
+// Navigation
+function goToScreen(num){
+document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+document.getElementById("screen"+num).classList.add("active");
+}
+
+// Passcode
+function checkCode(){
+let code=document.getElementById("passcode").value;
+let hint=document.getElementById("hintMsg");
+if(code==="1506"){
+goToScreen(3);
+nextGameRound();
+}else{
+hint.innerHTML="❌ Wrong code! Hint: Independence Day 😉";
+}
+}
+
+// Countdown Timer
+let startDate=new Date("August 15, 2025 00:00:00").getTime();
+setInterval(function(){
+let now=new Date().getTime();
+let distance=now-startDate;
+let days=Math.floor(distance/(1000*60*60*24));
+let hours=Math.floor((distance%(1000*60*60*24))/(1000*60*60));
+let minutes=Math.floor((distance%(1000*60*60))/(1000*60));
+let seconds=Math.floor((distance%(1000*60))/1000);
+document.getElementById("loveTimer").innerHTML=days+" Days 💖 "+hours+" Hours 💘 "+minutes+" Minutes 💕 "+seconds+" Seconds 💓";
+},1000);
+
+// Game Logic
+let gameRounds=0, totalRounds=3, currentNumber=0;
+function nextGameRound(){
+document.getElementById("guessNumber").value="";
+document.getElementById("gameHint").innerText="";
+document.getElementById("gameNextBtn").style.display="none";
+if(gameRounds<totalRounds){
+currentNumber=(Math.floor(Math.random()*10)+1)*2;
+gameRounds++;
+}else{
+goToScreen(4); loadQuestion(); triggerConfetti();
+}
+}
+function checkGuess(){
+let guess=parseInt(document.getElementById("guessNumber").value);
+let hint=document.getElementById("gameHint");
+if(guess===currentNumber){
+hint.innerText="🎉 Correct! My love ❤️";
+document.getElementById("gameNextBtn").style.display="inline-block";
+}else{
+hint.innerText="Oops! Not quite, but I still love you 😘 (Answer was "+currentNumber+")";
+document.getElementById("gameNextBtn").style.display="inline-block";
+}
+}
+
+// Quiz
+const quizQuestions=[
+{question:"Which month did we start dating?",options:["June","August","July","September"],answer:"August"},
+{question:"My favorite thing about you?",options:["Smile","Eyes","Hug","All of the above"],answer:"All of the above"},
+{question:"Where did we first meet?",options:["School","Cafe","Park","Church"],answer:"Church"},
+{question:"My favorite person to annoy?",options:["Mom","Dad","You","Friend"],answer:"You"}
+];
+let currentQ=0;
+function loadQuestion(){
+let q=quizQuestions[currentQ];
+document.getElementById("quizQuestion").innerText=q.question;
+let optionsHtml="";
+q.options.forEach(opt=>{
+optionsHtml+=`<button class="quizOption" onclick="checkAnswer('${opt}')">${opt}</button>`;
+});
+document.getElementById("quizOptions").innerHTML=optionsHtml;
+document.getElementById("quizFeedback").innerText="";
+document.getElementById("nextQuestionBtn").style.display="none";
+}
+function checkAnswer(selected){
+let q=quizQuestions[currentQ];
+let feedback=document.getElementById("quizFeedback");
+if(selected===q.answer){
+feedback.innerText="✅ Correct! ❤️ You know me!";
+}else{
+feedback.innerText="❌ Oops! Cute try 😉";
+}
+document.getElementById("nextQuestionBtn").style.display="inline-block";
+}
+function nextQuestion(){
+currentQ++;
+if(currentQ<quizQuestions.length){
+loadQuestion();
+}else{
+goToScreen(5); // Countdown
+triggerConfetti();
+}
+}
+
+// Confetti
+function triggerConfetti(){
+let canvas=document.getElementById('confettiCanvas');
+canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+let ctx=canvas.getContext('2d');
+let confetti=[];
+for(let i=0;i<150;i++){
+confetti.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height- canvas.height,
+r:Math.random()*6+4,
+d:Math.random()*150+50,
+color:'hsl('+Math.random()*360+',100%,50%)',
+tilt:Math.random()*10-10,
+tiltAngleIncrement:Math.random()*0.07+0.05
+});
+}
+function draw(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+confetti.forEach(c=>{
+ctx.beginPath();
+ctx.lineWidth=c.r/2;
+ctx.strokeStyle=c.color;
+ctx.moveTo(c.x+c.tilt+c.r/4, c.y);
+ctx.lineTo(c.x+c.tilt, c.y+c.tilt+ c.r/2);
+ctx.stroke();
+c.tiltAngle += c.tiltAngleIncrement;
+c.y += (Math.cos(c.d)+3+c.r/2)/2;
+c.x += Math.sin(c.tiltAngle);
+if(c.y>canvas.height) c.y=-10;
+});
+requestAnimationFrame(draw);
+}
+draw();
+}
+</script>
+</body>
+</html>
